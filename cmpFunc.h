@@ -1,4 +1,11 @@
-#include<time.h>
+#include <time.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <string.h>
+#include <stdlib.h>
+
+
 
 typedef struct{
     //char type; // l gia link, d gia directory, f gia file, WE COULD USE DIRENT D_TYPE

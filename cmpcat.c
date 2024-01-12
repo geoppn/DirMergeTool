@@ -41,9 +41,21 @@ int main(int argc, char *argv[]){
     int capacity1 = INITIAL_SIZE;
     int capacity2 = INITIAL_SIZE;
 
-    int i=0;
-    read_directory(dirInput1,dir1Info,&i,&capacity1);
-    i=0;
-    read_directory(dirInput2,dir2Info,&i,&capacity2);
+    int size1 = 0;
+    read_directory(dirInput1,&dir1Info,&size1,&capacity1);
+    
+    int size2 = 0;
+    read_directory(dirInput2,&dir2Info,&size2,&capacity2);
+
+    printf("Directory 1:\n");
+    for (int j = 0; j < size1; j++) {
+        printf("Path: %s, Name: %s, Size: %d, Last edited: %ld\n", dir1Info[j].path, dir1Info[j].name, dir1Info[j].size, dir1Info[j].lastedited);
+
+    }
+
+    printf("Directory 2:\n");
+    for (int j = 0; j < size2; j++) {
+        printf("Path: %s, Name: %s, Size: %d, Last edited: %ld\n", dir2Info[j].path, dir2Info[j].name, dir2Info[j].size, dir2Info[j].lastedited);
+    }
 
 }
