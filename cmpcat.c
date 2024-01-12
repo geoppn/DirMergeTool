@@ -2,11 +2,14 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <string.h>
+#include "cmpFunc.h"
+
+#define INITIAL_SIZE 15 // INITIAL SIZE OF DYNAMIC ARRAY
 
 int main(int argc, char *argv[]){
     char *dirInput1 = NULL;
     char *dirInput2 = NULL;
-    char *dirOutput = NULL;
+    char *dirOutput = NULL; 
     // ARGUMENT PARSING
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-d") == 0 && i + 2 < argc) {
@@ -31,5 +34,16 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
+
+    EntryInfo* dir1Info = malloc(INITIAL_SIZE*sizeof(EntryInfo)); 
+    EntryInfo* dir2Info = malloc(INITIAL_SIZE*sizeof(EntryInfo));
+
+    int capacity1 = INITIAL_SIZE;
+    int capacity2 = INITIAL_SIZE;
+
+    int i=0;
+    read_directory(dirInput1,dir1Info,&i,&capacity1);
+    i=0;
+    read_directory(dirInput2,dir2Info,&i,&capacity2);
 
 }
