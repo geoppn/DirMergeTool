@@ -58,4 +58,6 @@ int main(int argc, char *argv[]){
         printf("Path: %s, Name: %s, Size: %d, Last edited: %s\n", dir2Info[j].path, dir2Info[j].name, dir2Info[j].size, ctime(&dir2Info[j].lastedited));
     }
 
+    free(dir1Info);
+    free(dir2Info);
 }
