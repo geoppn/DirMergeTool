@@ -45,7 +45,7 @@ void read_directory(const char *dirInput, EntryInfo **dirInfo, int *i, int *capa
 
         info.size = fileStat.st_size;
         info.lastedited = fileStat.st_mtime;   
-        //info.iID = fileStat.st_ino;
+        info.iID = fileStat.st_ino;
 
         /*if (S_ISLNK(fileStat.st_mode)) {
             ssize_t len = readlink(filePath, info.linkPointer, sizeof(info.linkPointer) - 1);
