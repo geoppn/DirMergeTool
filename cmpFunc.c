@@ -70,9 +70,21 @@ void compare_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, in
     for (int i = 0; i < size1; i++) {
         int found = 0;
         for (int j = 0; j < size2; j++) {
-            if (strcmp(dir1Info[i].name, dir2Info[j].name) == 0) {
-                found = 1;
-                break;
+            if (strcmp(dir1Info[i].name, dir2Info[j].name) == 0 && strcmp(dir1Info[i].path, dir2Info[j].path) == 0) {
+                if (dir1Info[i].type == dir2Info[j].type) {
+                    if (dir1Info[i].type == FILE && dir1Info[i].size == dir2Info[j].size && memcmp(dir1Info[i].content, dir2Info[j].content, dir1Info[i].size) == 0) {
+                        found = 1;
+                    } else if (dir1Info[i].type == DIRECTORY) {
+                        found = 1;
+                    } else if (dir1Info[i].type == SOFT_LINK && strcmp(dir1Info[i].linkPointer, dir2Info[j].linkPointer) == 0) {
+                        found = 1;
+                    } else if (dir1Info[i].type == HARD_LINK && dir1Info[i].iID == dir2Info[j].iID) {
+                        found = 1;
+                    }
+                }
+                if (found) {
+                    break;
+                }
             }
         }
         if (!found) {
@@ -84,9 +96,21 @@ void compare_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, in
     for (int i = 0; i < size2; i++) {
         int found = 0;
         for (int j = 0; j < size1; j++) {
-            if (strcmp(dir2Info[i].name, dir1Info[j].name) == 0) {
-                found = 1;
-                break;
+            if (strcmp(dir2Info[i].name, dir1Info[j].name) == 0 && strcmp(dir2Info[i].path, dir1Info[j].path) == 0) {
+                if (dir2Info[i].type == dir1Info[j].type) {
+                    if (dir2Info[i].type == FILE && dir2Info[i].size == dir1Info[j].size && memcmp(dir2Info[i].content, dir1Info[j].content, dir2Info[i].size) == 0) {
+                        found = 1;
+                    } else if (dir2Info[i].type == DIRECTORY) {
+                        found = 1;
+                    } else if (dir2Info[i].type == SOFT_LINK && strcmp(dir2Info[i].linkPointer, dir1Info[j].linkPointer) == 0) {
+                        found = 1;
+                    } else if (dir2Info[i].type == HARD_LINK && dir2Info[i].iID == dir1Info[j].iID) {
+                        found = 1;
+                    }
+                }
+                if (found) {
+                    break;
+                }
             }
         }
         if (!found) {
