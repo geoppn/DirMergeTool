@@ -54,6 +54,19 @@ void read_directory(const char *dirInput, EntryInfo **dirInfo, int *i, int *capa
             }
         }
 
+        // Determine the type of the entry
+        if (entry->d_type == DT_REG) {
+            if (fileStat.st_nlink > 1) {
+                info.type = HARD_LINK; // hard link
+            } else {
+                info.type = FILE1; // file
+            }
+        } else if (entry->d_type == DT_DIR) {
+            info.type = DIRECTORY; // directory
+        } else if (entry->d_type == DT_LNK) {
+            info.type = SOFT_LINK; // symbolic link
+        }
+
         (*dirInfo)[*i] = info; 
         (*i)++;
 
@@ -72,7 +85,7 @@ void compare_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, in
         for (int j = 0; j < size2; j++) {
             if (strcmp(dir1Info[i].name, dir2Info[j].name) == 0 && strcmp(dir1Info[i].path, dir2Info[j].path) == 0) {
                 if (dir1Info[i].type == dir2Info[j].type) {
-                    if (dir1Info[i].type == FILE && dir1Info[i].size == dir2Info[j].size && memcmp(dir1Info[i].content, dir2Info[j].content, dir1Info[i].size) == 0) {
+                    if (dir1Info[i].type == FILE1 && dir1Info[i].size == dir2Info[j].size && memcmp(dir1Info[i].content, dir2Info[j].content, dir1Info[i].size) == 0) {
                         found = 1;
                     } else if (dir1Info[i].type == DIRECTORY) {
                         found = 1;
@@ -98,7 +111,7 @@ void compare_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, in
         for (int j = 0; j < size1; j++) {
             if (strcmp(dir2Info[i].name, dir1Info[j].name) == 0 && strcmp(dir2Info[i].path, dir1Info[j].path) == 0) {
                 if (dir2Info[i].type == dir1Info[j].type) {
-                    if (dir2Info[i].type == FILE && dir2Info[i].size == dir1Info[j].size && memcmp(dir2Info[i].content, dir1Info[j].content, dir2Info[i].size) == 0) {
+                    if (dir2Info[i].type == FILE1 && dir2Info[i].size == dir1Info[j].size && memcmp(dir2Info[i].content, dir1Info[j].content, dir2Info[i].size) == 0) {
                         found = 1;
                     } else if (dir2Info[i].type == DIRECTORY) {
                         found = 1;
