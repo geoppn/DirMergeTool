@@ -19,3 +19,4 @@ typedef struct{
 }EntryInfo;
 
 void read_directory(const char *dirInput, EntryInfo **dirInfo, int *i, int *capacity);
+void compare_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, int size2);

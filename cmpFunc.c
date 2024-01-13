@@ -65,3 +65,32 @@ void read_directory(const char *dirInput, EntryInfo **dirInfo, int *i, int *capa
     closedir(dir);
 }
  
+void compare_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, int size2) {
+    printf("In dirA:\n");
+    for (int i = 0; i < size1; i++) {
+        int found = 0;
+        for (int j = 0; j < size2; j++) {
+            if (strcmp(dir1Info[i].name, dir2Info[j].name) == 0) {
+                found = 1;
+                break;
+            }
+        }
+        if (!found) {
+            printf("%s\n", dir1Info[i].path);
+        }
+    }
+
+    printf("In dirB:\n");
+    for (int i = 0; i < size2; i++) {
+        int found = 0;
+        for (int j = 0; j < size1; j++) {
+            if (strcmp(dir2Info[i].name, dir1Info[j].name) == 0) {
+                found = 1;
+                break;
+            }
+        }
+        if (!found) {
+            printf("%s\n", dir2Info[i].path);
+        }
+    }
+}
