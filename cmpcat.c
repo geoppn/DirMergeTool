@@ -49,13 +49,13 @@ int main(int argc, char *argv[]){
 
     printf("Directory 1:\n");
     for (int j = 0; j < size1; j++) {
-        printf("Path: %s, Name: %s, Size: %d, Last edited: %ld\n", dir1Info[j].path, dir1Info[j].name, dir1Info[j].size, dir1Info[j].lastedited);
+        printf("Path: %s, Name: %s, Size: %d, Last edited: %s\n", dir1Info[j].path, dir1Info[j].name, dir1Info[j].size, ctime(&dir1Info[j].lastedited));
 
     }
 
     printf("Directory 2:\n");
     for (int j = 0; j < size2; j++) {
-        printf("Path: %s, Name: %s, Size: %d, Last edited: %ld\n", dir2Info[j].path, dir2Info[j].name, dir2Info[j].size, dir2Info[j].lastedited);
+        printf("Path: %s, Name: %s, Size: %d, Last edited: %s\n", dir2Info[j].path, dir2Info[j].name, dir2Info[j].size, ctime(&dir2Info[j].lastedited));
     }
 
 }
