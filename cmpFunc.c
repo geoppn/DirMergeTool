@@ -40,15 +40,7 @@ void read_directory(const char *dirInput, EntryInfo **dirInfo, int *i, int *capa
         EntryInfo info;
         strncpy(info.name, entry->d_name, sizeof(info.name));
 
-        char *relativePath = strstr(filePath, dirInput);
-        if (relativePath != NULL) {
-            relativePath += strlen(dirInput);
-            while (*relativePath == '/') {
-                relativePath++;
-            }
-        } else {
-            relativePath = filePath;
-        }
+        char *relativePath = filePath + strlen(dirInput) + 1;
         strncpy(info.path, relativePath, sizeof(info.path));
 
         info.size = fileStat.st_size;
