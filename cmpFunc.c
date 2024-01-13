@@ -10,7 +10,12 @@ void read_directory(const char *dirInput, EntryInfo **dirInfo, int *i, int *capa
         perror("opendir");
         return;
     }
-    int dirInputLen = strlen(dirInput);
+
+    static int initialDirLen = 0;
+    if (initialDirLen == 0) {
+        initialDirLen = strlen(dirInput);
+    }
+    
     struct dirent *entry;
     struct stat fileStat;
     while ((entry = readdir(dir)) != NULL) {
@@ -40,7 +45,7 @@ void read_directory(const char *dirInput, EntryInfo **dirInfo, int *i, int *capa
         EntryInfo info;
         strncpy(info.name, entry->d_name, sizeof(info.name));
 
-        char *relativePath = filePath + dirInputLen + 1;
+        char *relativePath = filePath + initialDirLen + 1;
         strncpy(info.path, relativePath, sizeof(info.path));
 
         info.size = fileStat.st_size;
