@@ -38,7 +38,7 @@ void read_directory(const char *dirInput, EntryInfo **dirInfo, int *i, int *capa
         }
 
         EntryInfo info;
-        //info.linkPointer[0] = '\0'; // INITIALIZE THE LINK POINTER TO NULL (IN CASE IT IS A FILE OR DIRECTORY)
+        info.linkPointer[0] = '\0'; // INITIALIZE THE LINK POINTER TO NULL (IN CASE IT IS A FILE OR DIRECTORY)
         strncpy(info.name, entry->d_name, sizeof(info.name));
 
         strncpy(info.path, filePath, sizeof(info.path));
@@ -47,12 +47,12 @@ void read_directory(const char *dirInput, EntryInfo **dirInfo, int *i, int *capa
         info.lastedited = fileStat.st_mtime;   
         info.iID = fileStat.st_ino;
 
-        /*if (S_ISLNK(fileStat.st_mode)) {
+        if (S_ISLNK(fileStat.st_mode)) {
             ssize_t len = readlink(filePath, info.linkPointer, sizeof(info.linkPointer) - 1);
             if (len != -1) {
                 info.linkPointer[len] = '\0';  // Ensure null-termination
             }
-        }*/
+        }
 
         (*dirInfo)[*i] = info; 
         (*i)++;
