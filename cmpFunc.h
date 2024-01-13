@@ -15,7 +15,7 @@ typedef struct{
     int size;
     time_t lastedited;
     //ino_t iID; // I-NODE ID FOR HARD LINKS
-    //char linkPointer[100]; // SOFT LINKS
+    char linkPointer[100]; // SOFT LINKS
 }EntryInfo;
 
 void read_directory(const char *dirInput, EntryInfo **dirInfo, int *i, int *capacity);
