@@ -17,6 +17,7 @@ typedef enum {
 typedef struct{
     //char type; // l gia link, d gia directory, f gia file, WE COULD USE DIRENT D_TYPE
     char path[100];
+    char relativepath[100];
     char name[20];
     int size;
     time_t lastedited;

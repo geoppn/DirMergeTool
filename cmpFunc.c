@@ -39,6 +39,12 @@ void read_directory(const char *dirInput, EntryInfo **dirInfo, int *i, int *capa
 
     struct dirent *entry;
     struct stat fileStat;
+    
+    static int initialDirLen = 0;
+    if (initialDirLen == 0) {
+        initialDirLen = strlen(dirInput);
+    }
+
     while ((entry = readdir(dir)) != NULL) {
         if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
             // SKIP . AND .. ENTRIES DUE TO LINUX ENVIROMENT
@@ -68,6 +74,10 @@ void read_directory(const char *dirInput, EntryInfo **dirInfo, int *i, int *capa
         strncpy(info.name, entry->d_name, sizeof(info.name));
 
         strncpy(info.path, filePath, sizeof(info.path));
+
+        char *relativePath = filePath + initialDirLen;
+        strncpy(info.relativepath, relativePath, sizeof(info.path));
+        printf("%s\n", info.relativepath);
 
         info.size = fileStat.st_size;
         info.lastedited = fileStat.st_mtime;   
@@ -109,9 +119,9 @@ void compare_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, in
     for (int i = 0; i < size1; i++) {
         int found = 0;
         for (int j = 0; j < size2; j++) {
-            if (strcmp(dir1Info[i].name, dir2Info[j].name) == 0 && strcmp(dir1Info[i].path, dir2Info[j].path) == 0) {
+            if (strcmp(dir1Info[i].name, dir2Info[j].name) == 0 && strcmp(dir1Info[i].relativepath, dir2Info[j].relativepath) == 0) {
                 if (dir1Info[i].type == dir2Info[j].type) {
-                    if (dir1Info[i].type == FILE1 && dir1Info[i].size == dir2Info[j].size && compare_files(dir1Info[i].path, dir2Info[j].path)) {
+                    if (dir1Info[i].type == FILE1 && dir1Info[i].size == dir2Info[j].size && compare_files(dir1Info[i].relativepath, dir2Info[j].relativepath)) {
                         found = 1;
                     } else if (dir1Info[i].type == DIRECTORY) {
                         found = 1;
@@ -127,7 +137,7 @@ void compare_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, in
             }
         }
         if (!found) {
-            printf("%s\n", dir1Info[i].path);
+            printf("%s\n", dir1Info[i].relativepath);
         }
     }
 
@@ -135,9 +145,9 @@ void compare_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, in
     for (int i = 0; i < size2; i++) {
         int found = 0;
         for (int j = 0; j < size1; j++) {
-            if (strcmp(dir2Info[i].name, dir1Info[j].name) == 0 && strcmp(dir2Info[i].path, dir1Info[j].path) == 0) {
+            if (strcmp(dir2Info[i].name, dir1Info[j].name) == 0 && strcmp(dir2Info[i].relativepath, dir1Info[j].relativepath) == 0) {
                 if (dir2Info[i].type == dir1Info[j].type) {
-                    if (dir1Info[i].type == FILE1 && dir1Info[i].size == dir2Info[j].size && compare_files(dir1Info[i].path, dir2Info[j].path)) {
+                    if (dir1Info[i].type == FILE1 && dir1Info[i].size == dir2Info[j].size && compare_files(dir1Info[i].relativepath, dir2Info[j].relativepath)) {
                         found = 1;
                     } else if (dir2Info[i].type == DIRECTORY) {
                         found = 1;
@@ -153,7 +163,7 @@ void compare_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, in
             }
         }
         if (!found) {
-            printf("%s\n", dir2Info[i].path);
+            printf("%s\n", dir2Info[i].relativepath);
         }
     }
 }
