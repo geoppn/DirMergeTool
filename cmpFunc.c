@@ -40,8 +40,7 @@ void read_directory(const char *dirInput, EntryInfo **dirInfo, int *i, int *capa
         EntryInfo info;
         strncpy(info.name, entry->d_name, sizeof(info.name));
 
-        char *relativePath = filePath + strlen(dirInput) + 1;
-        strncpy(info.path, relativePath, sizeof(info.path));
+        strncpy(info.path, filePath, sizeof(info.path));
 
         info.size = fileStat.st_size;
         info.lastedited = fileStat.st_mtime;   
