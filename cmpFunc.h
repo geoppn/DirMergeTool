@@ -27,3 +27,4 @@ typedef struct{
 
 void read_directory(const char *dirInput, EntryInfo **dirInfo, int *i, int *capacity);
 void compare_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, int size2);
+int compare_files(const char* file1, const char* file2);

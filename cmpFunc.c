@@ -4,6 +4,32 @@
 #include <dirent.h>
 #include <string.h>
 
+int compare_files(const char* file1, const char* file2) {
+    FILE* f1 = fopen(file1, "rb");
+    FILE* f2 = fopen(file2, "rb");
+    if (f1 == NULL || f2 == NULL) {
+        if (f1 != NULL) fclose(f1);
+        if (f2 != NULL) fclose(f2);
+        return 0;
+    }
+
+    int result = 1;
+    char ch1, ch2;
+    do {
+        ch1 = getc(f1);
+        ch2 = getc(f2);
+
+        if (ch1 != ch2) {
+            result = 0;
+            break;
+        }
+    } while (ch1 != EOF && ch2 != EOF);
+
+    fclose(f1);
+    fclose(f2);
+    return result;
+}
+
 void read_directory(const char *dirInput, EntryInfo **dirInfo, int *i, int *capacity) {
     DIR *dir = opendir(dirInput);
     if (dir == NULL) {
@@ -85,7 +111,7 @@ void compare_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, in
         for (int j = 0; j < size2; j++) {
             if (strcmp(dir1Info[i].name, dir2Info[j].name) == 0 && strcmp(dir1Info[i].path, dir2Info[j].path) == 0) {
                 if (dir1Info[i].type == dir2Info[j].type) {
-                    if (dir1Info[i].type == FILE1 && dir1Info[i].size == dir2Info[j].size && memcmp(dir1Info[i].content, dir2Info[j].content, dir1Info[i].size) == 0) {
+                    if (dir1Info[i].type == FILE1 && dir1Info[i].size == dir2Info[j].size && compare_files(dir1Info[i].path, dir2Info[j].path)) {
                         found = 1;
                     } else if (dir1Info[i].type == DIRECTORY) {
                         found = 1;
@@ -111,7 +137,7 @@ void compare_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, in
         for (int j = 0; j < size1; j++) {
             if (strcmp(dir2Info[i].name, dir1Info[j].name) == 0 && strcmp(dir2Info[i].path, dir1Info[j].path) == 0) {
                 if (dir2Info[i].type == dir1Info[j].type) {
-                    if (dir2Info[i].type == FILE1 && dir2Info[i].size == dir1Info[j].size && memcmp(dir2Info[i].content, dir1Info[j].content, dir2Info[i].size) == 0) {
+                    if (dir1Info[i].type == FILE1 && dir1Info[i].size == dir2Info[j].size && compare_files(dir1Info[i].path, dir2Info[j].path)) {
                         found = 1;
                     } else if (dir2Info[i].type == DIRECTORY) {
                         found = 1;
