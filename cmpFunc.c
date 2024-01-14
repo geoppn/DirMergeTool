@@ -167,3 +167,72 @@ void compare_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, in
         }
     }
 }
+
+int directory_exists(const char *path) {
+    struct stat statbuf;
+
+    if (stat(path, &statbuf) == -1) 
+    {
+        // Error occurred while trying to get info about the directory
+        return NOTEXISTS;
+    }
+
+    return EXISTS;
+}
+
+// Merge
+
+void MergeDirectories(const char *dir1, const char *dir2, const char *dir3)
+{
+    if (directory_exists("DIR3") == NOTEXISTS)
+    {
+        mkdir(dir3, 0755);
+    }
+
+    DIR *d1 = opendir(dir1);
+    DIR *d2 = opendir(dir2);
+    struct dirent *entry1;
+    struct dirent *entry2;
+
+    while ((entry1 = readdir(d1)) != NULL && (entry2 = readdir(d2)) != NULL) {
+        // Skip . and .. entries
+        if (strcmp(entry1->d_name, ".") == 0 || strcmp(entry1->d_name, "..") == 0 ||
+            strcmp(entry2->d_name, ".") == 0 || strcmp(entry2->d_name, "..") == 0) {
+            continue;
+        }
+
+        // Check if the entries are common between DIR1 and DIR2
+        if (strcmp(entry1->d_name, entry2->d_name) == 0) {
+            // Construct the source and destination paths
+            char src1[PATH_MAX], src2[PATH_MAX], dest[PATH_MAX];
+            snprintf(src1, sizeof(src1), "%s/%s", dir1, entry1->d_name);
+            snprintf(src2, sizeof(src2), "%s/%s", dir2, entry2->d_name);
+            snprintf(dest, sizeof(dest), "%s/%s", dir3, entry1->d_name);
+
+            // Check if the entries are files or directories
+            struct stat statbuf1, statbuf2;
+            stat(src1, &statbuf1);
+            stat(src2, &statbuf2);
+
+            if (S_ISREG(statbuf1.st_mode) && S_ISREG(statbuf2.st_mode)) {
+                // The entries are files, so copy them
+                char cmd[PATH_MAX * 3];
+                snprintf(cmd, sizeof(cmd), "cp %s %s", src1, dest);
+                system(cmd);
+                snprintf(cmd, sizeof(cmd), "cp %s %s", src2, dest);
+                system(cmd);
+            } else if (S_ISDIR(statbuf1.st_mode) && S_ISDIR(statbuf2.st_mode)) {
+                // The entries are directories, so copy them recursively
+                char cmd[PATH_MAX * 3];
+                snprintf(cmd, sizeof(cmd), "cp -r %s %s", src1, dest);
+                system(cmd);
+                snprintf(cmd, sizeof(cmd), "cp -r %s %s", src2, dest);
+                system(cmd);
+            }
+        }
+    }
+
+    closedir(d1);
+    closedir(d2);
+
+}
