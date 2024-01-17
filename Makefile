@@ -15,3 +15,6 @@ cmpFunc.o : cmpFunc.c
 
 clean:
 	rm -f $(OBJS) $(OUT) 
+	
+rdir:
+	rm -r DIR3

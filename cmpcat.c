@@ -10,6 +10,9 @@ int main(int argc, char *argv[]){
     char *dirInput1 = NULL;
     char *dirInput2 = NULL;
     char *dirOutput = NULL; 
+
+    int DashS = -1;
+
     // ARGUMENT PARSING
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-d") == 0 && i + 2 < argc) {
@@ -19,6 +22,7 @@ int main(int argc, char *argv[]){
         } else if (strcmp(argv[i], "-s") == 0 && i + 1 < argc) {
             dirOutput = argv[i + 1];
             i++;
+            DashS = 0;
         }
     }
 
@@ -47,21 +51,29 @@ int main(int argc, char *argv[]){
     int size2 = 0;
     read_directory(dirInput2,&dir2Info,&size2,&capacity2);
 
-    printf("Directory 1:\n");
+    printf("-----------------\n");
+    printf("Directory 1:\n\n");
     for (int j = 0; j < size1; j++) {
-        printf("Path: %s, Name: %s, Size: %d, Last edited: %s INO: %lu, SL: %s\n", dir1Info[j].path, dir1Info[j].name, dir1Info[j].size, ctime(&dir1Info[j].lastedited), dir1Info[j].iID, dir1Info[j].linkPointer);
-        printf("RL : %s\n", dir1Info[j].relativepath);
+        printf("Path: %s, Name: %s, Size: %d, Last edited: %s I-Node: %lu, Soft Links: %s", dir2Info[j].path, dir2Info[j].name, dir2Info[j].size, ctime(&dir2Info[j].lastedited), dir1Info[j].iID, dir1Info[j].linkPointer);
+        printf("Relative Path : %s\n\n", dir2Info[j].relativepath);
     }
 
-    printf("Directory 2:\n");
+    printf("-----------------\n");
+    printf("Directory 2:\n\n");
     for (int j = 0; j < size2; j++) {
-        printf("Path: %s, Name: %s, Size: %d, Last edited: %s INO: %lu, SL: %s\n", dir2Info[j].path, dir2Info[j].name, dir2Info[j].size, ctime(&dir2Info[j].lastedited), dir1Info[j].iID, dir1Info[j].linkPointer);
-        printf("RL : %s\n", dir2Info[j].relativepath);
+        printf("Path: %s, Name: %s, Size: %d, Last edited: %s I-Node: %lu, Soft Links: %s", dir2Info[j].path, dir2Info[j].name, dir2Info[j].size, ctime(&dir2Info[j].lastedited), dir1Info[j].iID, dir1Info[j].linkPointer);
+        printf("Relative Path : %s\n\n", dir2Info[j].relativepath);
     }
 
     compare_directories(dir1Info, size1, dir2Info, size2);
 
-    merge_directories(dir1Info, size1, dir2Info, size2, "DIR3");
+    if (DashS == -1)
+    {
+        merge_directories(dir1Info, size1, dir2Info, size2, "DIR3");
+    } else 
+    {
+        merge_directories(dir1Info, size1, dir2Info, size2, dirOutput);
+    }
 
     free(dir1Info);
     free(dir2Info);

@@ -35,4 +35,6 @@ void read_directory(const char *dirInput, EntryInfo **dirInfo, int *i, int *capa
 void compare_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, int size2);
 int compare_files(const char* file1, const char* file2);
 int directory_exists(const char *path);
+void copy_directory(const char* sourcePath, const char* destinationPath) ;
+void copy_file(const char* sourcePath, const char* destinationPath);
 void merge_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, int size2, const char* mergedDirName);

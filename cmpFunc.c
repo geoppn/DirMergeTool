@@ -225,10 +225,10 @@ void copy_directory(const char* sourcePath, const char* destinationPath) {
             continue;
         }
 
-        char source[200];
+        char source[300];
         sprintf(source, "%s/%s", sourcePath, entry->d_name);
 
-        char destination[200];
+        char destination[300];
         sprintf(destination, "%s/%s", destinationPath, entry->d_name);
 
         if (entry->d_type == DT_DIR) {
@@ -242,53 +242,98 @@ void copy_directory(const char* sourcePath, const char* destinationPath) {
 }
 
 void merge_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, int size2, const char* mergedDirName) {
-    if (directory_exists(mergedDirName) == NOTEXISTS) {
+    
+    // Ελέγχει αν ο συγχωνευμένος κατάλογος υπάρχει ήδη
+    if (directory_exists(mergedDirName) == NOTEXISTS) 
+    {
+        // Δημιουργεί τον συγχωνευμένο κατάλογο αν δεν υπάρχει
         mkdir(mergedDirName, 0777);
     }
 
-    for (int i = 0; i < size1; i++) {
-        char newPath[200];
+    // Διατρέχει όλες τις καταχωρήσεις στον πρώτο κατάλογο
+    for (int i = 0; i < size1; i++) 
+    {
+        // Δημιουργείται η νέα διαδρομή για την καταχώρηση
+        char newPath[300];
         sprintf(newPath, "%s/%s", mergedDirName, dir1Info[i].relativepath);
-        char newDirPath[100];
+        // Δημιουργείται η νέα διαδρομή για τον νέο κατάλογο
+        char newDirPath[300];
         strncpy(newDirPath, newPath, strrchr(newPath, '/') - newPath);
-        mkdir(newDirPath, 0777);
-        if (dir1Info[i].type == FILE1) {
+
+        // Ελέγχεται αν η καταχώρηση είναι αρχείο
+        if (dir1Info[i].type == FILE1) 
+        {
+            // Αν το αρχείο υπάρχει ήδη/Περίπτωση ίδιου ονόματος
             if (file_exists(newPath) == EXISTS) {
                 struct stat statbuf;
-                stat(newPath, &statbuf);
-                if (dir1Info[i].lastedited > statbuf.st_mtime) {
-                    copy_file(dir1Info[i].path, newPath);
+                stat(newPath, &statbuf);                    // Αντλούται οι πληροφορίες του αρχείου
+                
+                if (dir1Info[i].lastedited > statbuf.st_mtime) 
+                {
+                    copy_file(dir1Info[i].path, newPath);   // Αντιγράφεται το πιο πρόσφατα τροποποιημένο αρχείο
                 }
-            } else {
-                copy_file(dir1Info[i].path, newPath);
+            // Διαφορετικά 
+            } else 
+            {
+                copy_file(dir1Info[i].path, newPath);       // Αντιγράφεται το αρχείο
             }
-        } else if (dir1Info[i].type == DIRECTORY) {
-            copy_directory(dir1Info[i].path, newPath);
-        } else if (dir1Info[i].type == SOFT_LINK || dir1Info[i].type == HARD_LINK) {
-            link(dir1Info[i].path, newPath);
+        // Ελέγχεται αν η καταχώρηση είναι directory
+        } else if (dir1Info[i].type == DIRECTORY) 
+        {
+            if (directory_exists(newPath) == EXISTS) 
+            {
+                continue;                                   // Ο κατάλογος υπάρχει ήδη, παραλείπεται
+            } else 
+            {
+                copy_directory(dir1Info[i].path, newPath);  // Αντιγράφεται ο κατάλογος αν δεν υπάρχει
+            }
+        // Ελέγχεται αν η καταχώρηση αποτελεί Soft Link/Hard Link
+        } else if (dir1Info[i].type == SOFT_LINK)
+        {
+            symlink(dir1Info[i].path, newPath);
+        } else if ( dir1Info[i].type == HARD_LINK)
+        {
+            link(dir1Info[i].path, newPath);                // Δημιουργία του αντίστοιχου link στον νέο κατάλογο
         }
     }
 
-    for (int i = 0; i < size2; i++) {
-        char newPath[200];
+    // Η διαδικασία που πραγματοποιέιται είναι η ακριβώς αντίστοιχη
+    for (int i = 0; i < size2; i++) 
+    {
+        char newPath[300];
         sprintf(newPath, "%s/%s", mergedDirName, dir2Info[i].relativepath);
-        char newDirPath[100];
+        char newDirPath[300];
         strncpy(newDirPath, newPath, strrchr(newPath, '/') - newPath);
-        mkdir(newDirPath, 0777);
-        if (dir2Info[i].type == FILE1) {
-            if (file_exists(newPath) == EXISTS) {
+
+        if (dir2Info[i].type == FILE1) 
+        {
+            if (file_exists(newPath) == EXISTS) 
+            {
                 struct stat statbuf;
                 stat(newPath, &statbuf);
-                if (dir2Info[i].lastedited > statbuf.st_mtime) {
+                
+                if (dir2Info[i].lastedited > statbuf.st_mtime) 
+                {
                     copy_file(dir2Info[i].path, newPath);
                 }
-            } else {
+            } else 
+            {
                 copy_file(dir2Info[i].path, newPath);
             }
-        } else if (dir2Info[i].type == DIRECTORY) {
-            copy_directory(dir2Info[i].path, newPath);
-        } else if (dir2Info[i].type == SOFT_LINK || dir2Info[i].type == HARD_LINK) {
-            link(dir2Info[i].path, newPath);
+        } else if (dir2Info[i].type == DIRECTORY) 
+        {
+            if (directory_exists(newPath) == EXISTS) 
+            {
+                continue;
+            } else {
+                copy_directory(dir2Info[i].path, newPath);
+            }
+        } else if (dir2Info[i].type == SOFT_LINK)
+        {
+            symlink(dir2Info[i].path, newPath);
+        } else if ( dir2Info[i].type == HARD_LINK)
+        {
+            link(dir2Info[i].path, newPath);                
         }
     }
 }
