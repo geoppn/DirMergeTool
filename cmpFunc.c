@@ -180,6 +180,14 @@ int directory_exists(const char *path) {
     return EXISTS;
 }
 
+int file_exists(const char* path) {
+    if (access(path, F_OK) != -1) {
+        return EXISTS;
+    } else {
+        return NOTEXISTS;
+    }
+}
+
 void copy_file(const char* sourcePath, const char* destinationPath) {
     char ch;
     FILE *source, *target;
