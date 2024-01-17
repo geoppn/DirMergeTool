@@ -239,8 +239,10 @@ void MergeDirectories(const char *dir1, const char *dir2, const char *dir3)
             {
                 // Περίπτωση directories (αναδρομική εισαγωγή)
                 char cmd[PATH_MAX * 3];
+
                 snprintf(cmd, sizeof(cmd), "cp -r %s %s", src1, dest);
                 system(cmd);
+                
                 snprintf(cmd, sizeof(cmd), "cp -r %s %s", src2, dest);
                 system(cmd);
             
