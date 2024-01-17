@@ -180,77 +180,32 @@ int directory_exists(const char *path) {
     return EXISTS;
 }
 
-// Merge
-
-void MergeDirectories(const char *dir1, const char *dir2, const char *dir3)
-{
-    // Έλεγχος ύπαρξης Directory προορισμού, αν δεν υπάρχει δημιουργείται
-    if (directory_exists("DIR3") == NOTEXISTS)
-    {
-        mkdir(dir3, 0755);
+void merge_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, int size2, const char* mergedDirName) {
+    if (directory_exists(mergedDirName) == NOTEXISTS) {
+        mkdir(mergedDirName, 0777);
     }
 
-    // Άνοιγμα των directories προς merge
-    DIR *d1 = opendir(dir1);
-    DIR *d2 = opendir(dir2);
-    struct dirent *entry1;
-    struct dirent *entry2;
-
-    // Επαναληπτικά προσπελαύνουμε τα περιοεχόμενα των δύο directories
-    while ((entry1 = readdir(d1)) != NULL && (entry2 = readdir(d2)) != NULL) 
-    {
-        // Παράκαμψη των καταχωρήσεων του τρέχοντος και του γονικού καταλόγου.
-        // Αν το όνομα της καταχώρησης είναι "." ή "..", τότε πρόκειται για τον τρέχοντα κατάλογο ή τον γονικό κατάλογο αντίστοιχα.
-        if (strcmp(entry1->d_name, ".") == 0 || strcmp(entry1->d_name, "..") == 0 ||
-            strcmp(entry2->d_name, ".") == 0 || strcmp(entry2->d_name, "..") == 0) 
-        {
-            // Σε αυτήν την περίπτωση παρακάμπτεται η τρέχουσα επανάληψη
-            continue;
-        }
-
-        // Έλεγχος αν οι καταχωρήσεις είναι κοινές μεταξύ του DIR1 και του DIR2.
-        if (strcmp(entry1->d_name, entry2->d_name) == 0) 
-        {
-            // Δημιουργία των paths προέλευσης και προορισμού.
-            char src1[PATH_MAX], src2[PATH_MAX], dest[PATH_MAX];            // Δημιουργία των μεταβλητών για τις διαδρομές των αρχείων.
-            snprintf(src1, sizeof(src1), "%s/%s", dir1, entry1->d_name);    // Χρησιμοποιούμε την snprintf για να δημιουργήσουμε την πλήρη διαδρομή του αρχείου.    
-            snprintf(src2, sizeof(src2), "%s/%s", dir2, entry2->d_name);    // ""
-            snprintf(dest, sizeof(dest), "%s/%s", dir3, entry1->d_name);    // ""
-
-            // Έλεγχος αν οι καταχωρήσεις είναι αρχεία ή κατάλογοι.
-            struct stat statbuf1, statbuf2;                                 // Δηλώνουμε δύο δομές stat για να αποθηκεύσουμε τις πληροφορίες των αρχείων.
-            stat(src1, &statbuf1);                                          // Χρησιμοποιούμε την συνάρτηση stat για να αντλήσουμε τις πληροφορίες του αρχείου src1 και τις αποθηκεύουμε στο statbuf1.
-            stat(src2, &statbuf2);                                          // Χρησιμοποιούμε την συνάρτηση stat για να αντλήσουμε τις πληροφορίες του αρχείου src2 και τις αποθηκεύουμε στο statbuf2.
-
-            // Ελέγχουμε αν και τα δύο αντικείμενα είναι αρχεία.
-            if (S_ISREG(statbuf1.st_mode) && S_ISREG(statbuf2.st_mode)) 
-            {    
-                // Περίπτωση αρχείων
-                char cmd[PATH_MAX * 3];                                     // Δημιουργία μιας μεταβλητής για να αποθηκεύσουμε την εντολή που θα εκτελέσουμε.
-                
-                snprintf(cmd, sizeof(cmd), "cp %s %s", src1, dest);         // Χρησιμοποιούμε την snprintf για να δημιουργήσουμε την εντολή "cp src1 dest".
-                system(cmd);                                                // Εκτέλεση της εντολής με την system.
-                
-                snprintf(cmd, sizeof(cmd), "cp %s %s", src2, dest);
-                system(cmd);
-
-            // Ελέγχουμε αν και τα δύο αντικείμενα είναι κατάλογοι.
-            } else if (S_ISDIR(statbuf1.st_mode) && S_ISDIR(statbuf2.st_mode)) 
-            {
-                // Περίπτωση directories (αναδρομική εισαγωγή)
-                char cmd[PATH_MAX * 3];
-
-                snprintf(cmd, sizeof(cmd), "cp -r %s %s", src1, dest);
-                system(cmd);
-                
-                snprintf(cmd, sizeof(cmd), "cp -r %s %s", src2, dest);
-                system(cmd);
-            
-            }
+    for (int i = 0; i < size1; i++) {
+        char newPath[100];
+        sprintf(newPath, "%s/%s", mergedDirName, dir1Info[i].name);
+        if (dir1Info[i].type == FILE) {
+            copy_file(dir1Info[i].path, newPath);
+        } else if (dir1Info[i].type == DIRECTORY) {
+            copy_directory(dir1Info[i].path, newPath);
+        } else if (dir1Info[i].type == SOFT_LINK || dir1Info[i].type == HARD_LINK) {
+            link(dir1Info[i].path, newPath);
         }
     }
 
-    closedir(d1);
-    closedir(d2);
-
+    for (int i = 0; i < size2; i++) {
+        char newPath[100];
+        sprintf(newPath, "%s/%s", mergedDirName, dir2Info[i].name);
+        if (dir2Info[i].type == FILE) {
+            copy_file(dir2Info[i].path, newPath);
+        } else if (dir2Info[i].type == DIRECTORY) {
+            copy_directory(dir2Info[i].path, newPath);
+        } else if (dir2Info[i].type == SOFT_LINK || dir2Info[i].type == HARD_LINK) {
+            link(dir2Info[i].path, newPath);
+        }
+    }
 }
