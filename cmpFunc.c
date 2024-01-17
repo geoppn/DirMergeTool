@@ -240,9 +240,20 @@ void merge_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, int 
 
     for (int i = 0; i < size1; i++) {
         char newPath[100];
-        sprintf(newPath, "%s/%s", mergedDirName, dir1Info[i].name);
+        sprintf(newPath, "%s/%s", mergedDirName, dir1Info[i].relativepath);
+        char newDirPath[100];
+        strncpy(newDirPath, newPath, strrchr(newPath, '/') - newPath);
+        mkdir(newDirPath, 0777);
         if (dir1Info[i].type == FILE1) {
-            copy_file(dir1Info[i].path, newPath);
+            if (file_exists(newPath) == EXISTS) {
+                struct stat statbuf;
+                stat(newPath, &statbuf);
+                if (dir1Info[i].lastedited > statbuf.st_mtime) {
+                    copy_file(dir1Info[i].path, newPath);
+                }
+            } else {
+                copy_file(dir1Info[i].path, newPath);
+            }
         } else if (dir1Info[i].type == DIRECTORY) {
             copy_directory(dir1Info[i].path, newPath);
         } else if (dir1Info[i].type == SOFT_LINK || dir1Info[i].type == HARD_LINK) {
@@ -252,9 +263,20 @@ void merge_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, int 
 
     for (int i = 0; i < size2; i++) {
         char newPath[100];
-        sprintf(newPath, "%s/%s", mergedDirName, dir2Info[i].name);
+        sprintf(newPath, "%s/%s", mergedDirName, dir2Info[i].relativepath);
+        char newDirPath[100];
+        strncpy(newDirPath, newPath, strrchr(newPath, '/') - newPath);
+        mkdir(newDirPath, 0777);
         if (dir2Info[i].type == FILE1) {
-            copy_file(dir2Info[i].path, newPath);
+            if (file_exists(newPath) == EXISTS) {
+                struct stat statbuf;
+                stat(newPath, &statbuf);
+                if (dir2Info[i].lastedited > statbuf.st_mtime) {
+                    copy_file(dir2Info[i].path, newPath);
+                }
+            } else {
+                copy_file(dir2Info[i].path, newPath);
+            }
         } else if (dir2Info[i].type == DIRECTORY) {
             copy_directory(dir2Info[i].path, newPath);
         } else if (dir2Info[i].type == SOFT_LINK || dir2Info[i].type == HARD_LINK) {
