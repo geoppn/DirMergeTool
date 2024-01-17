@@ -217,20 +217,21 @@ void copy_directory(const char* sourcePath, const char* destinationPath) {
         return;
     }
 
+    mkdir(destinationPath, 0777);
+
     struct dirent* entry;
     while ((entry = readdir(dir)) != NULL) {
         if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
             continue;
         }
 
-        char source[100];
+        char source[200];
         sprintf(source, "%s/%s", sourcePath, entry->d_name);
 
-        char destination[100];
+        char destination[200];
         sprintf(destination, "%s/%s", destinationPath, entry->d_name);
 
         if (entry->d_type == DT_DIR) {
-            mkdir(destination, 0777);
             copy_directory(source, destination);
         } else {
             copy_file(source, destination);
@@ -246,7 +247,7 @@ void merge_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, int 
     }
 
     for (int i = 0; i < size1; i++) {
-        char newPath[100];
+        char newPath[200];
         sprintf(newPath, "%s/%s", mergedDirName, dir1Info[i].relativepath);
         char newDirPath[100];
         strncpy(newDirPath, newPath, strrchr(newPath, '/') - newPath);
@@ -269,7 +270,7 @@ void merge_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, int 
     }
 
     for (int i = 0; i < size2; i++) {
-        char newPath[100];
+        char newPath[200];
         sprintf(newPath, "%s/%s", mergedDirName, dir2Info[i].relativepath);
         char newDirPath[100];
         strncpy(newDirPath, newPath, strrchr(newPath, '/') - newPath);
