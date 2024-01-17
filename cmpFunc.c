@@ -241,7 +241,7 @@ void merge_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, int 
     for (int i = 0; i < size1; i++) {
         char newPath[100];
         sprintf(newPath, "%s/%s", mergedDirName, dir1Info[i].name);
-        if (dir1Info[i].type == FILE) {
+        if (dir1Info[i].type == FILE1) {
             copy_file(dir1Info[i].path, newPath);
         } else if (dir1Info[i].type == DIRECTORY) {
             copy_directory(dir1Info[i].path, newPath);
@@ -253,7 +253,7 @@ void merge_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, int 
     for (int i = 0; i < size2; i++) {
         char newPath[100];
         sprintf(newPath, "%s/%s", mergedDirName, dir2Info[i].name);
-        if (dir2Info[i].type == FILE) {
+        if (dir2Info[i].type == FILE1) {
             copy_file(dir2Info[i].path, newPath);
         } else if (dir2Info[i].type == DIRECTORY) {
             copy_directory(dir2Info[i].path, newPath);

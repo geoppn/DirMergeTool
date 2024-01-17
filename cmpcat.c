@@ -61,7 +61,7 @@ int main(int argc, char *argv[]){
 
     compare_directories(dir1Info, size1, dir2Info, size2);
 
-    MergeDirectories("DIR1", "DIR2", "DIR3");
+    merge_directories(dir1Info, size1, dir2Info, size2, "DIR3");
 
     free(dir1Info);
     free(dir2Info);
