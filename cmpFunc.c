@@ -217,8 +217,6 @@ void copy_directory(const char* sourcePath, const char* destinationPath) {
         return;
     }
 
-    mkdir(destinationPath, 0777);
-
     struct dirent* entry;
     while ((entry = readdir(dir)) != NULL) {
         if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
@@ -232,6 +230,7 @@ void copy_directory(const char* sourcePath, const char* destinationPath) {
         sprintf(destination, "%s/%s", destinationPath, entry->d_name);
 
         if (entry->d_type == DT_DIR) {
+            mkdir(destination, 0777);
             copy_directory(source, destination);
         } else {
             copy_file(source, destination);
