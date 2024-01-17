@@ -180,6 +180,59 @@ int directory_exists(const char *path) {
     return EXISTS;
 }
 
+void copy_file(const char* sourcePath, const char* destinationPath) {
+    char ch;
+    FILE *source, *target;
+
+    source = fopen(sourcePath, "r");
+    if (source == NULL) {
+        return;
+    }
+
+    target = fopen(destinationPath, "w");
+    if (target == NULL) {
+        fclose(source);
+        return;
+    }
+
+    while ((ch = fgetc(source)) != EOF) {
+        fputc(ch, target);
+    }
+
+    fclose(source);
+    fclose(target);
+}
+
+void copy_directory(const char* sourcePath, const char* destinationPath) {
+    DIR* dir = opendir(sourcePath);
+    if (dir == NULL) {
+        return;
+    }
+
+    mkdir(destinationPath, 0777);
+
+    struct dirent* entry;
+    while ((entry = readdir(dir)) != NULL) {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+            continue;
+        }
+
+        char source[100];
+        sprintf(source, "%s/%s", sourcePath, entry->d_name);
+
+        char destination[100];
+        sprintf(destination, "%s/%s", destinationPath, entry->d_name);
+
+        if (entry->d_type == DT_DIR) {
+            copy_directory(source, destination);
+        } else {
+            copy_file(source, destination);
+        }
+    }
+
+    closedir(dir);
+}
+
 void merge_directories(EntryInfo* dir1Info, int size1, EntryInfo* dir2Info, int size2, const char* mergedDirName) {
     if (directory_exists(mergedDirName) == NOTEXISTS) {
         mkdir(mergedDirName, 0777);
