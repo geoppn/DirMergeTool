@@ -77,7 +77,7 @@ void read_directory(const char *dirInput, EntryInfo **dirInfo, int *i, int *capa
 
         char *relativePath = filePath + initialDirLen; // CALCULATE THE RELATIVE PATH BY REMOVING THE ROOT DIR. NAME
         strncpy(info.relativepath, relativePath, sizeof(info.path));
-        printf("%s\n", info.relativepath);
+        
 
         info.size = fileStat.st_size;
         info.lastedited = fileStat.st_mtime;   
